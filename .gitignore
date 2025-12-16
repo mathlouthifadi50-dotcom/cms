@@ -125,3 +125,26 @@ apps/strapi/public/uploads/
 apps/web/.next/
 apps/web/out/
 apps/web/public/build/
+
+# Docker specific
+docker-compose.override.yml
+.docker/
+
+# Volume mounts and data
+volumes/
+ssl/
+*.pem
+*.key
+*.crt
+
+# Backup files
+*.backup
+*.dump
+*.sql
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+*.crt
+*.csr

@@ -1,0 +1,168 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: app_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-app}
+      POSTGRES_USER: ${DATABASE_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME:-postgres} -d ${DATABASE_NAME:-app}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - app-network
+
+  # Strapi CMS
+  strapi:
+    build:
+      context: ./apps/strapi
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    container_name: app_strapi
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_CLIENT: ${DATABASE_CLIENT:-postgres}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_NAME: ${DATABASE_NAME:-app}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      STRAPI_HOST: ${STRAPI_HOST:-0.0.0.0}
+      STRAPI_PORT: ${STRAPI_PORT:-1337}
+      STRAPI_APP_KEYS: ${STRAPI_APP_KEYS}
+      STRAPI_API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
+      STRAPI_ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
+      STRAPI_JWT_SECRET: ${STRAPI_JWT_SECRET}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_SENDER_NAME: ${SMTP_SENDER_NAME:-App Name}
+      SMTP_SENDER_EMAIL: ${SMTP_SENDER_EMAIL:-noreply@app.com}
+      JWT_SECRET: ${STRAPI_JWT_SECRET}
+      ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
+      API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
+      APP_KEYS: ${STRAPI_APP_KEYS}
+    volumes:
+      - strapi_uploads:/app/uploads
+      - strapi_data:/app/.strapi
+      - strapi_tmp:/app/.tmp
+    ports:
+      - "${STRAPI_PORT:-1337}:1337"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1337/api/health-check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.strapi.rule=Host(`strapi.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.strapi.entrypoints=websecure"
+      - "traefik.http.routers.strapi.tls.certresolver=letsencrypt"
+
+  # Next.js Web Application
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+        NODE_ENV: production
+    container_name: app_web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      strapi:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.rule=Host(`${DOMAIN:-localhost}`) || Host(`www.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.web.entrypoints=websecure"
+      - "traefik.http.routers.web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.web.loadbalancer.server.port=3000"
+
+  # Optional: Redis for caching (production)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: app_redis
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+  #   volumes:
+  #     - redis_data:/data
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - app-network
+
+# Named volumes for persistent data
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/postgres
+  strapi_uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/strapi/uploads
+  strapi_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/strapi/data
+  strapi_tmp:
+    driver: local
+  # redis_data:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: ./volumes/redis
+
+# Docker network
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
