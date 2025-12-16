@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_sections_testimonials",
+  "info": {
+    "displayName": "Testimonials Section",
+    "icon": "quote",
+    "description": "Testimonials section with customer reviews"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subtitle": {
+      "type": "text"
+    },
+    "testimonials": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.testimonial-item"
+    },
+    "layout": {
+      "type": "enumeration",
+      "enum": ["grid", "carousel", "masonry"],
+      "default": "carousel"
+    },
+    "showRating": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

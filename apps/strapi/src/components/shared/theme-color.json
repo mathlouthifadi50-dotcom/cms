@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_theme_colors",
+  "info": {
+    "displayName": "Theme Color",
+    "icon": "palette",
+    "description": "Theme color token"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "value": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
