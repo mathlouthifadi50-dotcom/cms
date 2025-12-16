@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_sections_features",
+  "info": {
+    "displayName": "Features Section",
+    "icon": "grid",
+    "description": "Features section with title and feature items"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subtitle": {
+      "type": "text"
+    },
+    "features": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.feature-item"
+    },
+    "layout": {
+      "type": "enumeration",
+      "enum": ["grid", "list", "carousel"],
+      "default": "grid"
+    },
+    "columns": {
+      "type": "integer",
+      "default": 3,
+      "min": 1,
+      "max": 4
+    }
+  }
+}
