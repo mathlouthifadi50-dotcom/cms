@@ -1,8 +1,10 @@
 # Multi-stage build for Next.js application
 # Stage 1: Dependencies and build
 FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
+
+# Enable corepack for pnpm support
+RUN corepack enable
 
 # Copy package files
 COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
@@ -11,13 +13,16 @@ COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
 RUN \
   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
   elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i --frozen-lockfile; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
 # Stage 2: Build application
 FROM node:20-alpine AS builder
 WORKDIR /app
+
+# Enable corepack for pnpm support
+RUN corepack enable
 
 # Copy dependencies from previous stage
 COPY --from=deps /app/node_modules ./node_modules
@@ -34,7 +39,7 @@ ENV NODE_ENV=production
 RUN \
   if [ -f yarn.lock ]; then yarn build; \
   elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm run build; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
   else echo "Lockfile not found." && exit 1; \
   fi
 

@@ -1,8 +1,11 @@
 # Multi-stage build for Strapi CMS
 # Stage 1: Dependencies and build
 FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat python3 make g++
+RUN apk add --no-cache python3 make g++
 WORKDIR /app
+
+# Enable corepack for pnpm support
+RUN corepack enable
 
 # Copy package files
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
@@ -11,7 +14,7 @@ COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 RUN \
   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
   elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i --frozen-lockfile; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
@@ -19,12 +22,20 @@ RUN \
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Enable corepack for pnpm support
+RUN corepack enable
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build Strapi admin panel and plugins
-RUN npm run build
+RUN \
+  if [ -f yarn.lock ]; then yarn build; \
+  elif [ -f package-lock.json ]; then npm run build; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
+  else npm run build; \
+  fi
 
 # Stage 3: Production runtime
 FROM node:20-alpine AS runner

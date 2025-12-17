@@ -4,19 +4,17 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  parser: '@babel/eslint-parser',
+  extends: [
+    'eslint:recommended',
+    'next/core-web-vitals',
+    'prettier'
+  ],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
-    requireConfigFile: false,
-    babelOptions: {
-      presets: ['@babel/preset-typescript', '@babel/preset-react'],
-    },
   },
-  extends: [
-    'eslint:recommended',
-  ],
   rules: {
+    // Custom rules specific to this project
     'no-unused-vars': 'warn',
     'no-console': 'warn',
     'prefer-const': 'error',
@@ -27,5 +25,10 @@ module.exports = {
     'node_modules/**',
     'build/**',
     'dist/**',
+    '.turbo/**',
+    'coverage/**',
+    'pnpm-lock.yaml',
+    '.next/static/**',
+    '.next/standalone/**',
   ],
 };
