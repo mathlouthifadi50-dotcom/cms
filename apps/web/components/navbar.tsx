@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link, usePathname } from '@/i18n/routing';
 import { Menu, Globe, X } from 'lucide-react';
 
 interface NavLink {
@@ -21,8 +22,10 @@ interface NavbarProps {
 }
 
 export function Navbar({ navigation, locale = 'en' }: NavbarProps) {
+  const t = useTranslations('nav');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,21 +36,17 @@ export function Navbar({ navigation, locale = 'en' }: NavbarProps) {
   }, []);
 
   const defaultLinks = [
-    { text: 'The Group', url: '#group' },
-    { text: 'Our Expertise', url: '#expertise' },
-    { text: 'Our Products', url: '#products' },
-    { text: 'News', url: '#news' },
-    { text: 'Join us', url: '#join' },
+    { text: t('home'), url: '/' },
+    { text: t('services'), url: '/services' },
+    { text: t('about'), url: '/about' },
+    { text: t('contact'), url: '/contact' },
   ];
 
   const links = navigation?.links && navigation.links.length > 0 ? navigation.links : defaultLinks;
 
   const languages = [
-    { code: 'en', label: 'EN', flag: '🇬🇧' },
-    { code: 'fr', label: 'FR', flag: '🇫🇷' },
-    { code: 'es', label: 'ES', flag: '🇪🇸' },
-    { code: 'de', label: 'DE', flag: '🇩🇪' },
-    { code: 'ar', label: 'AR', flag: '🇸🇦' },
+    { code: 'en', label: 'EN' },
+    { code: 'fr', label: 'FR' },
   ];
 
   return (
@@ -67,7 +66,7 @@ export function Navbar({ navigation, locale = 'en' }: NavbarProps) {
           {links.map((link, index) => (
             <Link 
               key={index}
-              href={link.url} 
+              href={link.url as any} 
               className="text-sm font-medium text-white/80 hover:text-primary transition-colors relative group"
             >
               {link.text}
@@ -82,15 +81,18 @@ export function Navbar({ navigation, locale = 'en' }: NavbarProps) {
               <Globe className="w-4 h-4" />
               <span>{locale.toUpperCase()}</span>
             </button>
-            <div className="absolute right-0 mt-2 w-40 bg-card border border-white/20 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
+            <div className="absolute right-0 mt-2 w-32 bg-card border border-white/20 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right z-50">
               <div className="py-1">
                 {languages.map((lang) => (
                   <Link
                     key={lang.code}
-                    href={`/${lang.code}`}
-                    className="block px-4 py-2 text-sm text-white hover:bg-primary/20"
+                    href={pathname as any}
+                    locale={lang.code as 'en' | 'fr'}
+                    className={`block px-4 py-2 text-sm hover:bg-primary/20 ${
+                      locale === lang.code ? 'text-primary' : 'text-white'
+                    }`}
                   >
-                    {lang.flag} {lang.label}
+                    {lang.label}
                   </Link>
                 ))}
               </div>
@@ -98,10 +100,10 @@ export function Navbar({ navigation, locale = 'en' }: NavbarProps) {
           </div>
           
           <Link
-            href={navigation?.ctaButton?.url || '/contact'}
+            href={navigation?.ctaButton?.url as any || '/contact'}
             className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-full px-6 py-2 shadow-lg shadow-primary/30 transition-transform hover:scale-105"
           >
-            {navigation?.ctaButton?.text || 'Contact'}
+            {navigation?.ctaButton?.text || t('contact')}
           </Link>
         </nav>
 
@@ -121,19 +123,36 @@ export function Navbar({ navigation, locale = 'en' }: NavbarProps) {
         {links.map((link, index) => (
           <Link 
             key={index}
-            href={link.url} 
+            href={link.url as any} 
             className="text-2xl font-bold text-white hover:text-primary"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             {link.text}
           </Link>
         ))}
+        <div className="flex gap-4 mt-4">
+          {languages.map((lang) => (
+            <Link
+              key={lang.code}
+              href={pathname as any}
+              locale={lang.code as 'en' | 'fr'}
+              className={`px-4 py-2 rounded-full border ${
+                locale === lang.code 
+                  ? 'bg-primary text-white border-primary' 
+                  : 'border-white/20 text-white'
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {lang.label}
+            </Link>
+          ))}
+        </div>
         <Link
-          href={navigation?.ctaButton?.url || '/contact'}
+          href={navigation?.ctaButton?.url as any || '/contact'}
           className="bg-primary text-primary-foreground text-lg px-8 py-4 rounded-full font-bold"
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          {navigation?.ctaButton?.text || 'Contact Us'}
+          {navigation?.ctaButton?.text || t('contact')}
         </Link>
       </div>
     </header>

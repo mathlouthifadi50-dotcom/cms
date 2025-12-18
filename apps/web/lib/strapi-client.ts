@@ -1,6 +1,13 @@
 import qs from "qs";
 
-export const STRAPI_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+const getStrapi = () => {
+  if (typeof window !== 'undefined') {
+    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:1337";
+  }
+  return process.env.STRAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL || "http://strapi:1337";
+};
+
+export const STRAPI_URL = getStrapi();
 export const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 interface FetchOptions extends RequestInit {
@@ -9,7 +16,7 @@ interface FetchOptions extends RequestInit {
 
 export async function fetchStrapi(
   path: string,
-  urlParamsObject: Record<string, any> = {},
+  urlParamsObject: Record<string, unknown> = {},
   options: FetchOptions = {}
 ) {
   try {
@@ -17,19 +24,19 @@ export async function fetchStrapi(
     const mergedOptions = {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${STRAPI_API_TOKEN}`,
+        ...(STRAPI_API_TOKEN ? { Authorization: `Bearer ${STRAPI_API_TOKEN}` } : {}),
         ...headers,
       },
       ...rest,
     };
 
     const queryString = qs.stringify(urlParamsObject, { encodeValuesOnly: true });
-    const requestUrl = `${STRAPI_URL}/api${path}${queryString ? `?${queryString}` : ""}`;
+    const strapiUrl = getStrapi();
+    const requestUrl = `${strapiUrl}/api${path}${queryString ? `?${queryString}` : ""}`;
 
     const response = await fetch(requestUrl, mergedOptions);
     
     if (!response.ok) {
-       // Handle 404 or 500
        return null;
     }
 
@@ -37,7 +44,7 @@ export async function fetchStrapi(
     return data;
   } catch (error) {
     console.error(`Error fetching from Strapi: ${path}`, error);
-    throw error; // Or return null depending on strategy
+    return null;
   }
 }
 
@@ -76,7 +83,6 @@ export async function getPageBySlug(slug: string, locale: string) {
                 'component.features': { populate: '*' },
                 'component.cta': { populate: '*' },
                 'component.testimonials': { populate: '*' },
-                // Add other components here
             }
         },
         seo: {

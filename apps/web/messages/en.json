@@ -1,0 +1,99 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "about": "About",
+    "contact": "Contact",
+    "language": "Language"
+  },
+  "hero": {
+    "title": "MENAPS,",
+    "titleHighlight": "is an integrated",
+    "subtitle": "Strategic and operational consulting group, with a strong dimension of technological and digital innovation.",
+    "cta": "Let's talk about it",
+    "floatingCard": {
+      "icon": "AI",
+      "title": "Innovation First",
+      "subtitle": "Leading the future"
+    },
+    "scrollDown": "Scroll down"
+  },
+  "distinction": {
+    "title": "What makes us",
+    "highlightedText": "different?",
+    "description": "We combine our business expertise with our technological mastery and data in order to bring you sustainable and innovative solutions.",
+    "features": {
+      "strategic": "Strategic Integration",
+      "operational": "Operational Excellence",
+      "technological": "Technological Mastery"
+    },
+    "cta": "Discover our values"
+  },
+  "services": {
+    "title": "Make us your",
+    "subtitle": "preferred ally",
+    "description": "As each company is unique, we are ready to intervene at any stage of the construction process.",
+    "digital": {
+      "title": "Digital Solutions",
+      "description": "Advanced solutions tailored to your business needs."
+    },
+    "consulting": {
+      "title": "Consulting",
+      "description": "Strategic guidance to optimize your operations."
+    },
+    "cybersecurity": {
+      "title": "Cybersecurity",
+      "description": "Protecting your assets with cutting-edge security."
+    },
+    "cta": "Learn more"
+  },
+  "stats": {
+    "projects": {
+      "value": "500",
+      "suffix": "+",
+      "label": "Projects Delivered"
+    },
+    "experts": {
+      "value": "50",
+      "suffix": "+",
+      "label": "Industry Experts"
+    },
+    "experience": {
+      "value": "25",
+      "suffix": "+",
+      "label": "Years Experience"
+    },
+    "countries": {
+      "value": "15",
+      "suffix": "+",
+      "label": "Countries Served"
+    }
+  },
+  "partners": {
+    "title": "Trusted by Industry Leaders"
+  },
+  "footer": {
+    "description": "Strategic and operational consulting group with technological and digital innovation.",
+    "quickLinks": "Quick Links",
+    "services": "Services",
+    "contact": "Contact",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "We'd love to hear from you",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "send": "Send Message",
+    "success": "Message sent successfully!",
+    "error": "Failed to send message. Please try again."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again"
+  }
+}

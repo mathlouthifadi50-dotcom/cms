@@ -1,0 +1,99 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "services": "Services",
+    "about": "À propos",
+    "contact": "Contact",
+    "language": "Langue"
+  },
+  "hero": {
+    "title": "MENAPS,",
+    "titleHighlight": "est un groupe intégré",
+    "subtitle": "Groupe de conseil stratégique et opérationnel, avec une forte dimension d'innovation technologique et digitale.",
+    "cta": "Parlons-en",
+    "floatingCard": {
+      "icon": "IA",
+      "title": "Innovation d'abord",
+      "subtitle": "Mener l'avenir"
+    },
+    "scrollDown": "Défiler vers le bas"
+  },
+  "distinction": {
+    "title": "Ce qui nous rend",
+    "highlightedText": "différents ?",
+    "description": "Nous combinons notre expertise métier avec notre maîtrise technologique et data afin de vous apporter des solutions durables et innovantes.",
+    "features": {
+      "strategic": "Intégration Stratégique",
+      "operational": "Excellence Opérationnelle",
+      "technological": "Maîtrise Technologique"
+    },
+    "cta": "Découvrir nos valeurs"
+  },
+  "services": {
+    "title": "Faites de nous votre",
+    "subtitle": "allié privilégié",
+    "description": "Comme chaque entreprise est unique, nous sommes prêts à intervenir à n'importe quelle étape du processus de construction.",
+    "digital": {
+      "title": "Solutions Digitales",
+      "description": "Solutions avancées adaptées aux besoins de votre entreprise."
+    },
+    "consulting": {
+      "title": "Conseil",
+      "description": "Accompagnement stratégique pour optimiser vos opérations."
+    },
+    "cybersecurity": {
+      "title": "Cybersécurité",
+      "description": "Protection de vos actifs avec une sécurité de pointe."
+    },
+    "cta": "En savoir plus"
+  },
+  "stats": {
+    "projects": {
+      "value": "500",
+      "suffix": "+",
+      "label": "Projets Livrés"
+    },
+    "experts": {
+      "value": "50",
+      "suffix": "+",
+      "label": "Experts du Secteur"
+    },
+    "experience": {
+      "value": "25",
+      "suffix": "+",
+      "label": "Années d'Expérience"
+    },
+    "countries": {
+      "value": "15",
+      "suffix": "+",
+      "label": "Pays Desservis"
+    }
+  },
+  "partners": {
+    "title": "Approuvé par les Leaders de l'Industrie"
+  },
+  "footer": {
+    "description": "Groupe de conseil stratégique et opérationnel avec innovation technologique et digitale.",
+    "quickLinks": "Liens Rapides",
+    "services": "Services",
+    "contact": "Contact",
+    "rights": "Tous droits réservés.",
+    "privacy": "Politique de Confidentialité",
+    "terms": "Conditions d'Utilisation"
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous serions ravis de vous entendre",
+    "name": "Nom",
+    "email": "Email",
+    "message": "Message",
+    "send": "Envoyer le Message",
+    "success": "Message envoyé avec succès !",
+    "error": "Échec de l'envoi du message. Veuillez réessayer."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer"
+  }
+}

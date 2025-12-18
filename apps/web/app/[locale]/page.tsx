@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { getPageBySlug } from "../../lib/strapi-client";
 import { SectionRenderer } from "../../components/section-renderer";
 import { Hero } from "../../components/sections/hero";
@@ -9,12 +10,19 @@ import { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  const page = await getPageBySlug('home', locale);
+  const t = await getTranslations({ locale, namespace: 'hero' });
+  
+  let page = null;
+  try {
+    page = await getPageBySlug('home', locale);
+  } catch {
+    // Strapi not available
+  }
   
   if (!page) {
     return {
-      title: 'MENAPS - Integrated Strategic Consulting',
-      description: 'Strategic and operational consulting group, with a strong dimension of technological and digital innovation.',
+      title: 'MENAPS - ' + t('titleHighlight'),
+      description: t('subtitle'),
     };
   }
 
@@ -26,12 +34,17 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'hero' });
+  const tDistinction = await getTranslations({ locale, namespace: 'distinction' });
+  const tServices = await getTranslations({ locale, namespace: 'services' });
+  const tStats = await getTranslations({ locale, namespace: 'stats' });
+  const tPartners = await getTranslations({ locale, namespace: 'partners' });
   
   let page = null;
   try {
     page = await getPageBySlug('home', locale);
   } catch (error) {
-    console.error('Failed to fetch page:', error);
+    // Strapi not available, use fallback content
   }
 
   if (page && page.attributes.sections && page.attributes.sections.length > 0) {
@@ -46,57 +59,57 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <main>
       <Hero 
         data={{
-          title: 'MENAPS,',
-          titleHighlight: 'is an integrated',
-          subtitle: 'Strategic and operational consulting group, with a strong dimension of technological and digital innovation.',
-          ctaButtons: [{ text: "Let's talk about it", url: '/contact' }],
+          title: t('title'),
+          titleHighlight: t('titleHighlight'),
+          subtitle: t('subtitle'),
+          ctaButtons: [{ text: t('cta'), url: '/contact' }],
           floatingCard: {
-            icon: 'AI',
-            title: 'Innovation First',
-            subtitle: 'Leading the future',
+            icon: t('floatingCard.icon'),
+            title: t('floatingCard.title'),
+            subtitle: t('floatingCard.subtitle'),
           },
           showScrollIndicator: true,
         }} 
       />
       <Distinction 
         data={{
-          title: 'What makes us',
-          highlightedText: 'different?',
-          description: 'We combine our business expertise with our technological mastery and data in order to bring you sustainable and innovative solutions.',
+          title: tDistinction('title'),
+          highlightedText: tDistinction('highlightedText'),
+          description: tDistinction('description'),
           features: [
-            { title: 'Strategic Integration' },
-            { title: 'Operational Excellence' },
-            { title: 'Technological Mastery' },
+            { title: tDistinction('features.strategic') },
+            { title: tDistinction('features.operational') },
+            { title: tDistinction('features.technological') },
           ],
-          ctaButton: { text: 'Discover our values', url: '/about' },
+          ctaButton: { text: tDistinction('cta'), url: '/about' },
         }} 
       />
       <ServicesGrid 
         data={{
-          title: 'Make us your',
-          subtitle: 'preferred ally',
-          description: 'As each company is unique, we are ready to intervene at any stage of the construction process.',
+          title: tServices('title'),
+          subtitle: tServices('subtitle'),
+          description: tServices('description'),
           services: [
-            { title: 'Digital Solutions', description: 'Advanced solutions tailored to your business needs.', icon: 'monitor' },
-            { title: 'Consulting', description: 'Strategic guidance to optimize your operations.', icon: 'briefcase' },
-            { title: 'Cybersecurity', description: 'Protecting your assets with cutting-edge security.', icon: 'shield-check' },
+            { title: tServices('digital.title'), description: tServices('digital.description'), icon: 'monitor' },
+            { title: tServices('consulting.title'), description: tServices('consulting.description'), icon: 'briefcase' },
+            { title: tServices('cybersecurity.title'), description: tServices('cybersecurity.description'), icon: 'shield-check' },
           ],
-          ctaButton: { text: 'Learn more', url: '/services' },
+          ctaButton: { text: tServices('cta'), url: '/services' },
         }} 
       />
       <Stats 
         data={{
           stats: [
-            { value: '500', suffix: '+', label: 'Projects Delivered' },
-            { value: '50', suffix: '+', label: 'Industry Experts' },
-            { value: '25', suffix: '+', label: 'Years Experience' },
-            { value: '15', suffix: '+', label: 'Countries Served' },
+            { value: tStats('projects.value'), suffix: tStats('projects.suffix'), label: tStats('projects.label') },
+            { value: tStats('experts.value'), suffix: tStats('experts.suffix'), label: tStats('experts.label') },
+            { value: tStats('experience.value'), suffix: tStats('experience.suffix'), label: tStats('experience.label') },
+            { value: tStats('countries.value'), suffix: tStats('countries.suffix'), label: tStats('countries.label') },
           ],
         }} 
       />
       <Partners 
         data={{
-          title: 'Trusted by Industry Leaders',
+          title: tPartners('title'),
           partners: [
             { name: 'Airbus' },
             { name: 'Renault' },

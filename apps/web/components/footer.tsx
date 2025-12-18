@@ -1,4 +1,7 @@
-import Link from 'next/link';
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface FooterProps {
   footer?: {
@@ -14,22 +17,24 @@ interface FooterProps {
 }
 
 export function Footer({ footer }: FooterProps) {
+  const t = useTranslations('footer');
+  const tNav = useTranslations('nav');
+
   const defaultColumns = [
     {
-      title: 'Company',
+      title: t('quickLinks'),
       links: [
-        { text: 'About Us', url: '/about' },
-        { text: 'Careers', url: '/careers' },
-        { text: 'News', url: '/news' },
-        { text: 'Contact', url: '/contact' },
+        { text: tNav('home'), url: '/' },
+        { text: tNav('about'), url: '/about' },
+        { text: tNav('services'), url: '/services' },
+        { text: tNav('contact'), url: '/contact' },
       ],
     },
     {
       title: 'Legal',
       links: [
-        { text: 'Privacy Policy', url: '/privacy' },
-        { text: 'Terms of Service', url: '/terms' },
-        { text: 'Cookie Policy', url: '/cookies' },
+        { text: t('privacy'), url: '/privacy' },
+        { text: t('terms'), url: '/terms' },
       ],
     },
   ];
@@ -43,7 +48,7 @@ export function Footer({ footer }: FooterProps) {
           <div className="col-span-1 md:col-span-2">
             <h2 className="text-3xl font-bold text-white mb-6">MENAPS</h2>
             <p className="text-gray-400 max-w-sm">
-              {footer?.description || 'Integrated strategic and operational consulting group. We build the digital future.'}
+              {footer?.description || t('description')}
             </p>
           </div>
           {columns.map((column, index) => (
@@ -52,7 +57,7 @@ export function Footer({ footer }: FooterProps) {
               <ul className="space-y-2 text-gray-400">
                 {column.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <Link href={link.url} className="hover:text-primary transition-colors">
+                    <Link href={link.url as any} className="hover:text-primary transition-colors">
                       {link.text}
                     </Link>
                   </li>
@@ -62,9 +67,9 @@ export function Footer({ footer }: FooterProps) {
           ))}
         </div>
         <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-          <p>&copy; {new Date().getFullYear()} MENAPS Group. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} MENAPS Group. {t('rights')}</p>
           <div className="flex gap-4 mt-4 md:mt-0">
-            <span>Made with ❤️</span>
+            <span>Made with innovation</span>
           </div>
         </div>
       </div>
