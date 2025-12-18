@@ -4,6 +4,7 @@ FROM node:20 AS builder
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
     python3 make g++ build-essential libvips-dev pkg-config \
+    libglib2.0-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -29,6 +30,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dumb-init \
     curl \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Create user for security
@@ -44,6 +46,11 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/apps/strapi ./apps/strapi
 
+# Copy wait script and entrypoint
+COPY scripts/wait-for-postgres.sh /usr/local/bin/wait-for-postgres.sh
+COPY scripts/strapi-entrypoint.sh /usr/local/bin/strapi-entrypoint.sh
+RUN chmod +x /usr/local/bin/wait-for-postgres.sh /usr/local/bin/strapi-entrypoint.sh
+
 # Create necessary directories
 RUN mkdir -p /app/apps/strapi/.tmp /app/apps/strapi/.cache /app/apps/strapi/public/uploads && \
     chown -R strapi:strapi /app
@@ -58,4 +65,4 @@ ENV HOME=/app
 
 WORKDIR /app/apps/strapi
 
-CMD ["dumb-init", "node", "./node_modules/@strapi/strapi/bin/strapi.js", "start"]
+CMD ["dumb-init", "/usr/local/bin/strapi-entrypoint.sh"]

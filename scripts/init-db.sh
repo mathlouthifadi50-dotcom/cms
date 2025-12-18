@@ -35,12 +35,9 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO app_user;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO app_user;
 
-    -- Set up proper encoding and locale
+    -- Set up proper encoding and timezone
+    -- Note: Locale settings are skipped for Alpine Linux compatibility
     ALTER DATABASE $POSTGRES_DB SET timezone TO 'UTC';
-    ALTER DATABASE $POSTGRES_DB SET lc_messages TO 'en_US.utf8';
-    ALTER DATABASE $POSTGRES_DB SET lc_monetary TO 'en_US.utf8';
-    ALTER DATABASE $POSTGRES_DB SET lc_numeric TO 'en_US.utf8';
-    ALTER DATABASE $POSTGRES_DB SET lc_time TO 'en_US.utf8';
     ALTER DATABASE $POSTGRES_DB SET default_text_search_config TO 'pg_catalog.english';
 
     -- Enable necessary extensions
