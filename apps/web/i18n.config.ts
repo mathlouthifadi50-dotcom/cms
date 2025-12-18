@@ -2,8 +2,11 @@ import { getRequestConfig } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 
 export default getRequestConfig(async ({ locale }) => {
-  // Validate locale
-  const validLocale = routing.locales.includes(locale as any) ? locale : routing.defaultLocale;
+  // Validate locale - ensure it's always a string
+  let validLocale: string = routing.defaultLocale;
+  if (locale && routing.locales.includes(locale as any)) {
+    validLocale = locale;
+  }
   
   try {
     // Try to fetch messages from Strapi via the i18n/request.ts configuration

@@ -8,7 +8,24 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    domains: ['localhost', 'strapi'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'http',
+        hostname: 'strapi',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'strapi',
+      },
+    ],
   },
 };
 
