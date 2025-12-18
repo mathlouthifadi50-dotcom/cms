@@ -19,7 +19,7 @@ RUN npm install -g pnpm@8.15.4
 WORKDIR /app
 
 # Copy workspace configuration
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml turbo.json ./
 
 # Copy workspace app packages
 COPY apps/web/package.json apps/web/
@@ -48,7 +48,7 @@ RUN npm install -g pnpm@8.15.4
 WORKDIR /app
 
 # Copy workspace configuration
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml turbo.json ./
 
 # Copy workspace packages
 COPY apps/web/package.json apps/web/
