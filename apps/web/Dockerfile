@@ -3,6 +3,16 @@
 # Stage 1: Install dependencies
 FROM node:20-slim AS deps
 
+# Install build dependencies for sharp and other native modules
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    build-essential \
+    libvips-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
 # Use official pnpm image with pre-installed pnpm
 RUN npm install -g pnpm@8.15.4
 
@@ -22,7 +32,18 @@ RUN pnpm install
 # Stage 2: Build application
 FROM node:20-slim AS builder
 
-RUN corepack enable && corepack prepare pnpm@8.15.4 --activate
+# Install build dependencies for sharp and other native modules
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    build-essential \
+    libvips-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Use pnpm installed globally
+RUN npm install -g pnpm@8.15.4
 
 WORKDIR /app
 
