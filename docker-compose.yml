@@ -36,6 +36,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
+      HOME: /app
       DATABASE_CLIENT: ${DATABASE_CLIENT:-postgres}
       DATABASE_HOST: postgres
       DATABASE_PORT: ${DATABASE_PORT:-5432}
