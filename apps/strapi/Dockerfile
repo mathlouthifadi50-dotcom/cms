@@ -4,7 +4,7 @@
 FROM node:20 AS deps
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 make g++ build-essential \
+    python3 make g++ build-essential libvips-dev pkg-config \
   && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g pnpm@latest
@@ -24,6 +24,10 @@ RUN pnpm install
 
 # Stage 2: Build Strapi admin panel
 FROM node:20 AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ build-essential libvips-dev pkg-config \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g pnpm@latest
 
