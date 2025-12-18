@@ -4,6 +4,10 @@ node_modules/
 .pnp
 .pnp.js
 
+# Lockfiles (pnpm only)
+package-lock.json
+yarn.lock
+
 # Production builds
 **/.next/
 **/build/
