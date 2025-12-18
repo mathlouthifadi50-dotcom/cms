@@ -1,7 +1,8 @@
 # Multi-stage build for Strapi CMS
 # Stage 1: Dependencies and build
-FROM node:20-alpine AS deps
-RUN apk add --no-cache python3 make g++
+FROM node:20 AS deps
+# Install build dependencies for Strapi compilation
+RUN apt-get update && apt-get install -y python3 make g++ build-essential && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Enable corepack for pnpm support
@@ -19,7 +20,7 @@ RUN \
   fi
 
 # Stage 2: Build Strapi admin panel and plugins
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 WORKDIR /app
 
 # Enable corepack for pnpm support
@@ -38,7 +39,7 @@ RUN \
   fi
 
 # Stage 3: Production runtime
-FROM node:20-alpine AS runner
+FROM node:20 AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -60,10 +61,16 @@ COPY --from=builder /app/.strapi ./strapi
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src ./src
 
-# Copy server files
-COPY --chown=strapi:strapi config ./config
-COPY --chown=strapi:strapi public ./public
-COPY --chown=strapi:strapi scripts ./scripts
+# Create required directories in runtime stage
+RUN mkdir -p ./config ./public ./scripts
+
+# Copy server files from builder stage (remove chown to handle missing directories)
+COPY --from=builder /app/config ./config
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/scripts ./scripts
+
+# Set proper ownership
+RUN chown -R strapi:strapi ./config ./public ./scripts 2>/dev/null || true
 
 # Create directories for uploads and database
 RUN mkdir -p /app/uploads && chown -R strapi:strapi /app/uploads
