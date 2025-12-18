@@ -28,8 +28,8 @@ services:
   # Strapi CMS
   strapi:
     build:
-      context: ./apps/strapi
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/strapi/Dockerfile
       args:
         NODE_ENV: production
     container_name: app_strapi
@@ -85,8 +85,8 @@ services:
   # Next.js Web Application
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/web/Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:1337}
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}

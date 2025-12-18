@@ -5,17 +5,17 @@ FROM node:20 AS deps
 RUN apt-get update && apt-get install -y python3 make g++ build-essential && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
-# Enable corepack for pnpm support
-RUN corepack enable
+# Install pnpm directly
+RUN npm install -g pnpm@8.15.4
 
-# Copy package files
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+# Copy package files from monorepo
+COPY apps/strapi/package.json pnpm-lock.yaml* ./
 
 # Install dependencies
 RUN \
   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
   elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
@@ -23,19 +23,19 @@ RUN \
 FROM node:20 AS builder
 WORKDIR /app
 
-# Enable corepack for pnpm support
-RUN corepack enable
+# Install pnpm directly
+RUN npm install -g pnpm@8.15.4
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY apps/strapi/ .
 
 # Build Strapi admin panel and plugins
 RUN \
   if [ -f yarn.lock ]; then yarn build; \
   elif [ -f package-lock.json ]; then npm run build; \
   elif [ -f pnpm-lock.yaml ]; then pnpm run build; \
-  else npm run build; \
+  else echo "Lockfile not found." && exit 1; \
   fi
 
 # Stage 3: Production runtime
@@ -46,7 +46,7 @@ ENV NODE_ENV=production
 ENV STRAPI_DISABLE_UPDATE_NOTIFICATION=true
 
 # Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+RUN apt-get update && apt-get install -y dumb-init && rm -rf /var/lib/apt/lists/*
 
 # Create Strapi user
 RUN addgroup --system --gid 1001 strapi && \
@@ -56,18 +56,18 @@ RUN addgroup --system --gid 1001 strapi && \
 COPY --from=deps /app/node_modules ./node_modules
 
 # Copy built Strapi application (excluding dev dependencies)
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/.strapi ./strapi
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src ./src
+COPY --from=builder /app/apps/strapi/package.json ./package.json
+COPY --from=builder /app/apps/strapi/.strapi ./strapi
+COPY --from=builder /app/apps/strapi/dist ./dist
+COPY --from=builder /app/apps/strapi/src ./src
 
 # Create required directories in runtime stage
 RUN mkdir -p ./config ./public ./scripts
 
 # Copy server files from builder stage (remove chown to handle missing directories)
-COPY --from=builder /app/config ./config
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/apps/strapi/config ./config
+COPY --from=builder /app/apps/strapi/public ./public
+COPY --from=builder /app/apps/strapi/scripts ./scripts
 
 # Set proper ownership
 RUN chown -R strapi:strapi ./config ./public ./scripts 2>/dev/null || true
