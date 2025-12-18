@@ -59,7 +59,11 @@ export async function getGlobalSettings(locale: string) {
         populate: '*',
       },
       seo: {
-        populate: '*',
+        populate: {
+          metaImage: {
+            populate: '*'
+          }
+        }
       }
     },
   };
@@ -86,7 +90,11 @@ export async function getPageBySlug(slug: string, locale: string) {
             }
         },
         seo: {
-            populate: '*',
+            populate: {
+                metaImage: {
+                    populate: '*'
+                }
+            }
         }
     },
   };

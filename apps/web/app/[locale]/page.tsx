@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { getPageBySlug } from "../../lib/strapi-client";
+import { getPageBySlug, getGlobalSettings, STRAPI_URL } from "../../lib/strapi-client";
 import { SectionRenderer } from "../../components/section-renderer";
 import { Hero } from "../../components/sections/hero";
 import { Distinction } from "../../components/sections/distinction";
@@ -13,22 +13,43 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const t = await getTranslations({ locale, namespace: 'hero' });
   
   let page = null;
+  let globalSettings = null;
+  
   try {
-    page = await getPageBySlug('home', locale);
+    [page, globalSettings] = await Promise.all([
+      getPageBySlug('home', locale),
+      getGlobalSettings(locale)
+    ]);
   } catch {
     // Strapi not available
   }
   
-  if (!page) {
+  const seo = page?.attributes?.seo || globalSettings?.attributes?.seo;
+  const siteName = globalSettings?.attributes?.siteName || 'MENAPS';
+  
+  if (!seo) {
     return {
-      title: 'MENAPS - ' + t('titleHighlight'),
+      title: `${siteName} - ${t('titleHighlight')}`,
       description: t('subtitle'),
     };
   }
 
+  const metaImage = seo.metaImage?.data?.attributes;
+  const imageUrl = metaImage ? (metaImage.url.startsWith('http') ? metaImage.url : `${STRAPI_URL}${metaImage.url}`) : null;
+
   return {
-    title: page.attributes.seo?.metaTitle || page.attributes.title,
-    description: page.attributes.seo?.metaDescription,
+    title: seo.metaTitle || page?.attributes?.title || siteName,
+    description: seo.metaDescription,
+    keywords: seo.keywords,
+    robots: seo.metaRobots || 'index, follow',
+    alternates: {
+      canonical: seo.canonicalURL,
+    },
+    openGraph: {
+      title: seo.metaTitle,
+      description: seo.metaDescription,
+      images: imageUrl ? [{ url: imageUrl }] : [],
+    },
   };
 }
 
