@@ -1,32 +1,32 @@
 # Multi-stage build for Next.js application
 # Stage 1: Dependencies and build
-FROM node:20-alpine AS deps
+FROM node:20-slim AS deps
 WORKDIR /app
 
-# Enable corepack for pnpm support
-RUN corepack enable
+# Install pnpm directly
+RUN npm install -g pnpm@8.15.4
 
-# Copy package files
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+# Copy package files from monorepo structure
+COPY apps/web/package.json pnpm-lock.yaml* ./
 
 # Install dependencies based on the preferred package manager
 RUN \
   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
   elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
 # Stage 2: Build application
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
 
-# Enable corepack for pnpm support
-RUN corepack enable
+# Install pnpm directly
+RUN npm install -g pnpm@8.15.4
 
 # Copy dependencies from previous stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY apps/web/ .
 
 # Set build-time environment variables
 ARG NEXT_PUBLIC_API_URL
@@ -44,7 +44,7 @@ RUN \
   fi
 
 # Stage 3: Production runtime
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -54,9 +54,9 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Copy built application
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./.next/static
+COPY --from=builder /app/apps/web/public ./public
 
 # Set ownership
 RUN chown -R nextjs:nodejs /app
