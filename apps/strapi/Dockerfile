@@ -25,42 +25,24 @@ RUN npm run build
 FROM node:20 AS runner
 WORKDIR /app
 
-# Install runtime dependencies
+# Install runtime dependencies (no pnpm install in this stage)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dumb-init \
     curl \
-    python3 \
-    make \
-    g++ \
-    build-essential \
-    libvips-dev \
-    pkg-config \
     && rm -rf /var/lib/apt/lists/*
-
-RUN corepack enable
 
 # Create user for security
 RUN addgroup --system --gid 1001 strapi && \
     adduser --system --uid 1001 strapi
 
-# Copy workspace configuration
-COPY --from=builder /app/pnpm-workspace.yaml ./
+# Copy workspace + dependencies from builder.
+# We intentionally skip `pnpm install --prod` here to avoid rebuilding native deps like sharp.
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
-
-# Copy package.json files for workspace
-COPY --from=builder /app/apps/strapi/package.json ./apps/strapi/
-COPY --from=builder /app/apps/web/package.json ./apps/web/
+COPY --from=builder /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages ./packages
-
-# Install production deps only
-RUN pnpm install --prod --frozen-lockfile
-
-# Copy built artifacts
-COPY --from=builder /app/apps/strapi/dist ./apps/strapi/dist
-COPY --from=builder /app/apps/strapi/config ./apps/strapi/config
-COPY --from=builder /app/apps/strapi/src ./apps/strapi/src
-COPY --from=builder /app/apps/strapi/scripts ./apps/strapi/scripts
+COPY --from=builder /app/apps/strapi ./apps/strapi
 
 # Create necessary directories
 RUN mkdir -p /app/apps/strapi/.tmp /app/apps/strapi/.cache /app/apps/strapi/public/uploads && \
