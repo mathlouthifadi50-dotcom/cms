@@ -10,18 +10,24 @@ import { motion, Variants } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ANIMATION_TOKENS, shouldReduceMotion } from '@/lib/animations';
 
+// Re-export animation hooks for convenience
+export { useInViewMotion, useScrollParallax } from '@/lib/hooks/animations';
+
 // Base animated container
-export interface AnimatedContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface AnimatedContainerProps {
   animation?: keyof typeof ANIMATION_TOKENS.section;
   delay?: number;
   stagger?: boolean;
   children?: React.ReactNode;
+  className?: string;
+  id?: string;
+  style?: React.CSSProperties;
 }
 
 export const AnimatedContainer = forwardRef<HTMLDivElement, AnimatedContainerProps>(
-  ({ className, animation = 'fadeInUp', delay = 0, stagger = false, children, ...props }, ref) => {
+  ({ className, animation = 'fadeInUp', delay = 0, stagger = false, children, id, style }, ref) => {
     if (shouldReduceMotion()) {
-      return <div ref={ref} className={cn(className)} {...props}>{children}</div>;
+      return <div ref={ref} className={cn(className)} id={id} style={style}>{children}</div>;
     }
 
     const animationConfig = ANIMATION_TOKENS.section[animation];
@@ -32,12 +38,13 @@ export const AnimatedContainer = forwardRef<HTMLDivElement, AnimatedContainerPro
         initial={animationConfig.initial}
         animate={animationConfig.animate}
         transition={{ 
-          ...animationConfig.transition, 
+          duration: animationConfig.transition.duration,
           delay,
-          ease: 'easeOut' as any
+          ease: 'easeOut'
         }}
         className={cn(className)}
-        {...props}
+        id={id}
+        style={style}
       >
         {children}
       </motion.div>
@@ -48,17 +55,20 @@ export const AnimatedContainer = forwardRef<HTMLDivElement, AnimatedContainerPro
 AnimatedContainer.displayName = 'AnimatedContainer';
 
 // Animated text with typewriter effect
-export interface AnimatedTextProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface AnimatedTextProps {
   text: string;
   delay?: number;
   duration?: number;
   reveal?: boolean;
+  className?: string;
+  id?: string;
+  style?: React.CSSProperties;
 }
 
 export const AnimatedText = forwardRef<HTMLSpanElement, AnimatedTextProps>(
-  ({ className, text, delay = 0, duration = 2, reveal = true, ...props }, ref) => {
+  ({ className, text, delay = 0, duration = 2, reveal = true, id, style }, ref) => {
     if (shouldReduceMotion()) {
-      return <span ref={ref} className={cn(className)} {...props}>{text}</span>;
+      return <span ref={ref} className={cn(className)} id={id} style={style}>{text}</span>;
     }
 
     return (
@@ -72,7 +82,8 @@ export const AnimatedText = forwardRef<HTMLSpanElement, AnimatedTextProps>(
           ease: 'easeOut'
         }}
         className={cn(className)}
-        {...props}
+        id={id}
+        style={style}
       >
         {text}
       </motion.span>
@@ -83,70 +94,104 @@ export const AnimatedText = forwardRef<HTMLSpanElement, AnimatedTextProps>(
 AnimatedText.displayName = 'AnimatedText';
 
 // Animated button with hover and tap effects
-export interface AnimatedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface AnimatedButtonProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   animate?: boolean;
   children?: React.ReactNode;
+  className?: string;
+  id?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onMouseEnter?: React.MouseEventHandler<HTMLButtonElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLButtonElement>;
+  onFocus?: React.FocusEventHandler<HTMLButtonElement>;
+  onBlur?: React.FocusEventHandler<HTMLButtonElement>;
+  form?: string;
+  name?: string;
+  value?: string;
+  'aria-label'?: string;
+  'aria-describedby'?: string;
 }
 
 export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>(
-  ({ className, variant = 'primary', size = 'md', animate = true, children, ...props }, ref) => {
+  ({ 
+    className, 
+    variant = 'primary', 
+    size = 'md', 
+    animate = true, 
+    children,
+    id,
+    type,
+    disabled,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onFocus,
+    onBlur,
+    form,
+    name,
+    value,
+    ...ariaProps
+  }, ref) => {
+    const baseClassName = cn(
+      'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+      {
+        'bg-primary text-primary-foreground hover:bg-primary/90': variant === 'primary',
+        'bg-secondary text-secondary-foreground hover:bg-secondary/80': variant === 'secondary',
+        'border border-input hover:bg-accent hover:text-accent-foreground': variant === 'outline',
+        'hover:bg-accent hover:text-accent-foreground': variant === 'ghost',
+      },
+      {
+        'h-8 px-3 text-sm': size === 'sm',
+        'h-10 px-4 py-2': size === 'md',
+        'h-12 px-8': size === 'lg',
+      },
+      className
+    );
+
     if (shouldReduceMotion()) {
       return (
         <button
           ref={ref}
-          className={cn(
-            'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-            {
-              'bg-primary text-primary-foreground hover:bg-primary/90': variant === 'primary',
-              'bg-secondary text-secondary-foreground hover:bg-secondary/80': variant === 'secondary',
-              'border border-input hover:bg-accent hover:text-accent-foreground': variant === 'outline',
-              'hover:bg-accent hover:text-accent-foreground': variant === 'ghost',
-            },
-            {
-              'h-8 px-3 text-sm': size === 'sm',
-              'h-10 px-4 py-2': size === 'md',
-              'h-12 px-8': size === 'lg',
-            },
-            className
-          )}
-          {...props}
+          className={baseClassName}
+          id={id}
+          type={type}
+          disabled={disabled}
+          onClick={onClick}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          form={form}
+          name={name}
+          value={value}
+          {...ariaProps}
         >
           {children}
         </button>
       );
     }
 
-    const motionProps = animate ? ANIMATION_TOKENS.micro.hover : {};
-
     return (
       <motion.button
         ref={ref}
-        whileHover={animate ? {
-          ...ANIMATION_TOKENS.micro.hover,
-          transition: { duration: 0.2, ease: 'easeOut' }
-        } : undefined}
-        whileTap={animate ? {
-          ...ANIMATION_TOKENS.micro.tap,
-          transition: { duration: 0.2, ease: 'easeIn' }
-        } : undefined}
-        className={cn(
-          'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          {
-            'bg-primary text-primary-foreground hover:bg-primary/90': variant === 'primary',
-            'bg-secondary text-secondary-foreground hover:bg-secondary/80': variant === 'secondary',
-            'border border-input hover:bg-accent hover:text-accent-foreground': variant === 'outline',
-            'hover:bg-accent hover:text-accent-foreground': variant === 'ghost',
-          },
-          {
-            'h-8 px-3 text-sm': size === 'sm',
-            'h-10 px-4 py-2': size === 'md',
-            'h-12 px-8': size === 'lg',
-          },
-          className
-        )}
-        {...props}
+        whileHover={animate ? { scale: 1.02 } : undefined}
+        whileTap={animate ? { scale: 0.98 } : undefined}
+        className={baseClassName}
+        id={id}
+        type={type}
+        disabled={disabled}
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        form={form}
+        name={name}
+        value={value}
+        {...ariaProps}
       >
         {children}
       </motion.button>
@@ -157,21 +202,25 @@ export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>
 AnimatedButton.displayName = 'AnimatedButton';
 
 // Animated card component
-export interface AnimatedCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface AnimatedCardProps {
   animation?: 'fadeInUp' | 'fadeInScale' | 'slideInLeft' | 'slideInRight';
   delay?: number;
   hover?: boolean;
   children?: React.ReactNode;
+  className?: string;
+  id?: string;
+  style?: React.CSSProperties;
 }
 
 export const AnimatedCard = forwardRef<HTMLDivElement, AnimatedCardProps>(
-  ({ className, animation = 'fadeInUp', delay = 0, hover = true, children, ...props }, ref) => {
+  ({ className, animation = 'fadeInUp', delay = 0, hover = true, children, id, style }, ref) => {
     if (shouldReduceMotion()) {
       return (
         <div
           ref={ref}
           className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', className)}
-          {...props}
+          id={id}
+          style={style}
         >
           {children}
         </div>
@@ -185,10 +234,15 @@ export const AnimatedCard = forwardRef<HTMLDivElement, AnimatedCardProps>(
         ref={ref}
         initial={animationConfig.initial}
         animate={animationConfig.animate}
-        transition={{ ...animationConfig.transition, delay }}
-        whileHover={hover ? ANIMATION_TOKENS.micro.hover : undefined}
+        transition={{ 
+          duration: animationConfig.transition.duration,
+          delay,
+          ease: 'easeOut'
+        }}
+        whileHover={hover ? { scale: 1.02 } : undefined}
         className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', className)}
-        {...props}
+        id={id}
+        style={style}
       >
         {children}
       </motion.div>
@@ -224,15 +278,18 @@ export const AnimatedImage = forwardRef<HTMLImageElement, AnimatedImageProps>(
 AnimatedImage.displayName = 'AnimatedImage';
 
 // Staggered container for animating lists
-export interface StaggerContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface StaggerContainerProps {
   staggerDelay?: number;
   children: React.ReactNode;
+  className?: string;
+  id?: string;
+  style?: React.CSSProperties;
 }
 
 export const StaggerContainer = forwardRef<HTMLDivElement, StaggerContainerProps>(
-  ({ className, staggerDelay = 0.1, children, ...props }, ref) => {
+  ({ className, staggerDelay = 0.1, children, id, style }, ref) => {
     if (shouldReduceMotion()) {
-      return <div ref={ref} className={cn(className)} {...props}>{children}</div>;
+      return <div ref={ref} className={cn(className)} id={id} style={style}>{children}</div>;
     }
 
     return (
@@ -249,7 +306,8 @@ export const StaggerContainer = forwardRef<HTMLDivElement, StaggerContainerProps
           },
         }}
         className={cn(className)}
-        {...props}
+        id={id}
+        style={style}
       >
         {children}
       </motion.div>
@@ -260,16 +318,19 @@ export const StaggerContainer = forwardRef<HTMLDivElement, StaggerContainerProps
 StaggerContainer.displayName = 'StaggerContainer';
 
 // Staggered item component
-export interface StaggerItemProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface StaggerItemProps {
   animation?: keyof typeof ANIMATION_TOKENS.section;
   delay?: number;
   children?: React.ReactNode;
+  className?: string;
+  id?: string;
+  style?: React.CSSProperties;
 }
 
 export const StaggerItem = forwardRef<HTMLDivElement, StaggerItemProps>(
-  ({ className, animation = 'fadeInUp', delay = 0, children, ...props }, ref) => {
+  ({ className, animation = 'fadeInUp', delay = 0, children, id, style }, ref) => {
     if (shouldReduceMotion()) {
-      return <div ref={ref} className={cn(className)} {...props}>{children}</div>;
+      return <div ref={ref} className={cn(className)} id={id} style={style}>{children}</div>;
     }
 
     const animationConfig = ANIMATION_TOKENS.section[animation];
@@ -281,11 +342,15 @@ export const StaggerItem = forwardRef<HTMLDivElement, StaggerItemProps>(
           hidden: animationConfig.initial,
           visible: {
             ...animationConfig.animate,
-            transition: animationConfig.transition,
+            transition: {
+              duration: animationConfig.transition.duration,
+              ease: 'easeOut'
+            },
           },
         }}
         className={cn(className)}
-        {...props}
+        id={id}
+        style={style}
       >
         {children}
       </motion.div>
