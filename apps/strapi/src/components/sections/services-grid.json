@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_sections_services_grids",
+  "info": {
+    "displayName": "Services Grid",
+    "icon": "grid",
+    "description": "Grid of service cards with icons"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "text"
+    },
+    "description": {
+      "type": "text"
+    },
+    "services": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.service-card"
+    },
+    "ctaButton": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.cta-button"
+    }
+  }
+}

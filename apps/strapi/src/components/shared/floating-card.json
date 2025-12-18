@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_shared_floating_cards",
+  "info": {
+    "displayName": "Floating Card",
+    "icon": "cube",
+    "description": "Floating card overlay element"
+  },
+  "options": {},
+  "attributes": {
+    "icon": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subtitle": {
+      "type": "string"
+    }
+  }
+}

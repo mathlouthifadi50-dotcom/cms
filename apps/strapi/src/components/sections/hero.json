@@ -11,11 +11,20 @@
       "type": "string",
       "required": true
     },
+    "titleHighlight": {
+      "type": "string"
+    },
     "subtitle": {
       "type": "text"
     },
     "description": {
       "type": "richtext"
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
     },
     "backgroundImage": {
       "type": "media",
@@ -28,14 +37,23 @@
       "repeatable": true,
       "component": "shared.cta-button"
     },
+    "floatingCard": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.floating-card"
+    },
     "alignment": {
       "type": "enumeration",
       "enum": ["left", "center", "right"],
-      "default": "center"
+      "default": "left"
     },
     "overlay": {
       "type": "boolean",
       "default": false
+    },
+    "showScrollIndicator": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

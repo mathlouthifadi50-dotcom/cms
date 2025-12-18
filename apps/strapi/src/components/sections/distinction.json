@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_sections_distinctions",
+  "info": {
+    "displayName": "Distinction Section",
+    "icon": "star",
+    "description": "What makes us different section with features list"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "highlightedText": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "features": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.feature-item"
+    },
+    "ctaButton": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.cta-button"
+    }
+  }
+}

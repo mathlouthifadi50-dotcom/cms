@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_shared_service_cards",
+  "info": {
+    "displayName": "Service Card",
+    "icon": "briefcase",
+    "description": "Individual service card for grid display"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "link": {
+      "type": "string"
+    }
+  }
+}

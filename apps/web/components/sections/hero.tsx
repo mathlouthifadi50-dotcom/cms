@@ -1,216 +1,126 @@
 'use client';
 
-/**
- * Enhanced Hero Section with Animations
- */
-
-import React from 'react';
-import { motion } from 'framer-motion';
-import { AnimatedButton, AnimatedText, AnimatedContainer, useScrollParallax } from '@/components/animated';
-import { ANIMATION_TOKENS, shouldReduceMotion } from '@/lib/animations';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight, ChevronDown } from 'lucide-react';
+import { STRAPI_URL } from '@/lib/strapi-client';
 
 interface HeroProps {
   data: {
     title?: string;
+    titleHighlight?: string;
     subtitle?: string;
     description?: string;
-    backgroundImage?: string;
-    ctaText?: string;
-    ctaLink?: string;
-    secondaryCtaText?: string;
-    secondaryCtaLink?: string;
-    parallaxSpeed?: number;
+    heroImage?: {
+      data?: {
+        attributes?: {
+          url: string;
+          alternativeText?: string;
+        };
+      };
+    };
+    ctaButtons?: Array<{
+      text: string;
+      url: string;
+      variant?: string;
+    }>;
+    floatingCard?: {
+      icon?: string;
+      title?: string;
+      subtitle?: string;
+    };
+    showScrollIndicator?: boolean;
   };
 }
 
 export function Hero({ data }: HeroProps) {
-  const parallaxSpeed = data.parallaxSpeed || 0.3;
-  const { elementRef, isParallaxActive } = useScrollParallax({
-    speed: parallaxSpeed,
-    enabled: !shouldReduceMotion(),
-  });
-
-  const backgroundStyle = data.backgroundImage
-    ? {
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${data.backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: isParallaxActive ? 'fixed' : 'scroll',
-      }
-    : {};
-
-  if (shouldReduceMotion()) {
-    return (
-      <section
-        ref={elementRef}
-        className="min-h-screen flex items-center justify-center py-20 px-4 text-center text-white relative"
-        style={backgroundStyle}
-      >
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            {data.title}
-          </h1>
-          {data.subtitle && (
-            <p className="text-xl md:text-2xl mb-8 opacity-90">
-              {data.subtitle}
-            </p>
-          )}
-          {data.description && (
-            <p className="text-lg mb-12 opacity-80 max-w-2xl mx-auto">
-              {data.description}
-            </p>
-          )}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {data.ctaText && (
-              <a href={data.ctaLink || '#'}>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
-                  {data.ctaText}
-                </button>
-              </a>
-            )}
-            {data.secondaryCtaText && (
-              <a href={data.secondaryCtaLink || '#'}>
-                <button className="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-3 px-8 rounded-lg transition-colors">
-                  {data.secondaryCtaText}
-                </button>
-              </a>
-            )}
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const heroImageUrl = data.heroImage?.data?.attributes?.url 
+    ? `${STRAPI_URL}${data.heroImage.data.attributes.url}`
+    : 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070';
 
   return (
-    <section
-      ref={elementRef}
-      className="min-h-screen flex items-center justify-center py-20 px-4 text-center text-white relative overflow-hidden"
-      style={backgroundStyle}
-    >
-      {/* Animated background elements */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5, ease: 'easeOut' }}
-      />
-      
-      {/* Floating particles effect */}
-      <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-white/10 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.1, 0.3, 0.1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+    <div className="relative min-h-screen flex items-center overflow-hidden pt-20">
+      <div className="absolute inset-0 bg-background z-0">
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] mix-blend-screen animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[100px] mix-blend-screen animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        <AnimatedContainer animation="fadeInUp" delay={0.2}>
-          <motion.h1
-            className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.8,
-              delay: 0.4,
-              ease: 'easeOut',
-            }}
-          >
-            <AnimatedText
-              text={data.title || 'Welcome to our platform'}
-              delay={0.6}
-              duration={1.2}
-            />
-          </motion.h1>
-        </AnimatedContainer>
+      <div className="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
+        <div className="reveal active">
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-white mb-6">
+            {data.title || 'MENAPS,'} <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">
+              {data.titleHighlight || 'is an integrated'}
+            </span>
+          </h1>
+          
+          <p className="text-xl text-muted-foreground mb-8 max-w-lg leading-relaxed">
+            {data.subtitle || 'Strategic and operational consulting group, with a strong dimension of technological and digital innovation.'}
+          </p>
 
-        {(data.subtitle || data.description) && (
-          <AnimatedContainer animation="fadeInUp" delay={0.8}>
-            {data.subtitle && (
-              <motion.p
-                className="text-xl md:text-2xl mb-8 opacity-90"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1 }}
-              >
-                {data.subtitle}
-              </motion.p>
-            )}
-            
-            {data.description && (
-              <motion.p
-                className="text-lg mb-12 opacity-80 max-w-2xl mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
-              >
-                {data.description}
-              </motion.p>
-            )}
-          </AnimatedContainer>
-        )}
-
-        {(data.ctaText || data.secondaryCtaText) && (
-          <AnimatedContainer animation="fadeInUp" delay={1.4}>
-            <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.6 }}
+          {data.ctaButtons && data.ctaButtons.length > 0 ? (
+            <div className="flex flex-wrap gap-4">
+              {data.ctaButtons.map((btn, index) => (
+                <Link
+                  key={index}
+                  href={btn.url || '#'}
+                  className={index === 0 
+                    ? "group bg-primary text-primary-foreground hover:bg-primary/90 rounded-full text-lg px-8 py-4 font-bold shadow-lg shadow-primary/40 inline-flex items-center transition-transform hover:scale-105"
+                    : "btn-outline"
+                  }
+                >
+                  {btn.text}
+                  {index === 0 && <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <Link
+              href="#contact"
+              className="group bg-primary text-primary-foreground hover:bg-primary/90 rounded-full text-lg px-8 py-4 font-bold shadow-lg shadow-primary/40 inline-flex items-center transition-transform hover:scale-105"
             >
-              {data.ctaText && (
-                <AnimatedButton variant="primary" size="lg">
-                  <a href={data.ctaLink || '#'}>
-                    {data.ctaText}
-                  </a>
-                </AnimatedButton>
-              )}
-              
-              {data.secondaryCtaText && (
-                <AnimatedButton variant="outline" size="lg">
-                  <a href={data.secondaryCtaLink || '#'}>
-                    {data.secondaryCtaText}
-                  </a>
-                </AnimatedButton>
-              )}
-            </motion.div>
-          </AnimatedContainer>
-        )}
+              Let&apos;s talk about it
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          )}
+        </div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 2 }}
-        >
-          <motion.div
-            className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <motion.div
-              className="w-1 h-3 bg-white/70 rounded-full mt-2"
-              animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
-          </motion.div>
-        </motion.div>
+        <div className="relative hidden md:block reveal active">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border border-white/10 group">
+            <div className="absolute inset-0 bg-gradient-to-tr from-background/40 to-transparent z-10"></div>
+            <div className="w-full h-[500px] relative overflow-hidden">
+              <Image
+                src={heroImageUrl}
+                alt={data.heroImage?.data?.attributes?.alternativeText || "Tech Consulting"}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                priority
+              />
+            </div>
+          </div>
+          
+          {data.floatingCard && (
+            <div className="absolute -bottom-10 -left-10 glass-card p-6 rounded-xl shadow-xl z-20 animate-bounce" style={{ animationDuration: '4s' }}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                  {data.floatingCard.icon || 'AI'}
+                </div>
+                <div>
+                  <h3 className="font-bold text-white">{data.floatingCard.title || 'Innovation First'}</h3>
+                  <p className="text-sm text-gray-400">{data.floatingCard.subtitle || 'Leading the future'}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </section>
+      
+      {(data.showScrollIndicator !== false) && (
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/30 flex flex-col items-center gap-2 animate-bounce">
+          <span className="text-xs tracking-widest uppercase">Scroll</span>
+          <ChevronDown className="w-4 h-4" />
+        </div>
+      )}
+    </div>
   );
 }

@@ -7,26 +7,30 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-      },
-      {
-        protocol: 'http',
-        hostname: 'strapi',
-      },
-      {
-        protocol: 'https',
-        hostname: 'localhost',
-      },
-      {
-        protocol: 'https',
-        hostname: 'strapi',
-      },
-    ],
-  },
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'http',
+          hostname: 'localhost',
+        },
+        {
+          protocol: 'http',
+          hostname: 'strapi',
+        },
+        {
+          protocol: 'https',
+          hostname: 'localhost',
+        },
+        {
+          protocol: 'https',
+          hostname: 'strapi',
+        },
+        {
+          protocol: 'https',
+          hostname: 'images.unsplash.com',
+        },
+      ],
+    },
 };
 
 export default nextConfig;

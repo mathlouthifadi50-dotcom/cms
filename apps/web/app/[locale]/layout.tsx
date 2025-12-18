@@ -1,25 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Raleway } from "next/font/google";
 import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { ThemeProvider } from "@/components/theme-provider";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { getGlobalSettings } from "@/lib/strapi-client";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const raleway = Raleway({
+  variable: "--font-raleway",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Web App",
-  description: "Web App with Strapi CMS",
+  title: "MENAPS - Integrated Strategic Consulting",
+  description: "Strategic and operational consulting group, with a strong dimension of technological and digital innovation.",
 };
 
 export default async function LocaleLayout({
@@ -31,27 +33,28 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
-  // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
   const messages = await getMessages();
+  
+  let globalSettings = null;
+  try {
+    globalSettings = await getGlobalSettings(locale);
+  } catch (error) {
+    console.error('Failed to fetch global settings:', error);
+  }
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className="scroll-smooth">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${raleway.variable} antialiased bg-background text-foreground`}
       >
         <NextIntlClientProvider messages={messages}>
-           <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
+          <Navbar navigation={globalSettings?.attributes?.navigation} locale={locale} />
+          {children}
+          <Footer footer={globalSettings?.attributes?.footer} />
         </NextIntlClientProvider>
       </body>
     </html>

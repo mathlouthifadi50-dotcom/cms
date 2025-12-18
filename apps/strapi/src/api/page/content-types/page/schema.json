@@ -45,15 +45,19 @@
         }
       }
     },
-    "sections": {
-      "type": "dynamiczone",
-      "components": [
-        "sections.hero",
-        "sections.features",
-        "sections.parallax",
-        "sections.cta",
-        "sections.testimonials"
-      ],
+"sections": {
+        "type": "dynamiczone",
+        "components": [
+          "sections.hero",
+          "sections.features",
+          "sections.parallax",
+          "sections.cta",
+          "sections.testimonials",
+          "sections.stats",
+          "sections.partners",
+          "sections.services-grid",
+          "sections.distinction"
+        ],
       "pluginOptions": {
         "i18n": {
           "localized": true

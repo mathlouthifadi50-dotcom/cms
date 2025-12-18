@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_sections_partners",
+  "info": {
+    "displayName": "Partners Marquee",
+    "icon": "handshake",
+    "description": "Partner logos marquee/carousel section"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "partners": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.partner-item"
+    }
+  }
+}

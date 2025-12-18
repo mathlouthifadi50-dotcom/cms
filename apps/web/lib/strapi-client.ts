@@ -1,6 +1,6 @@
 import qs from "qs";
 
-export const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+export const STRAPI_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 export const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
 interface FetchOptions extends RequestInit {
