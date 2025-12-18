@@ -10,12 +10,10 @@ module.exports = {
       const locales = await i18nPlugin.services.locales.find();
       
       // Ensure English is the default locale
-      const englishLocale = locales.find(locale => locale.code === 'en');
-      if (englishLocale && !englishLocale.isDefault) {
-        await i18nPlugin.services.locales.update(englishLocale.id, {
-          isDefault: true,
-        });
-      }
+        const englishLocale = locales.find(locale => locale.code === 'en');
+        if (englishLocale && !englishLocale.isDefault) {
+          await i18nPlugin.services.locales.setDefaultLocale(englishLocale.id);
+        }
       
       strapi.log.info('i18n locales configured');
     }
