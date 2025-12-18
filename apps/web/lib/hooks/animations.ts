@@ -256,7 +256,7 @@ export const useGSAPContext = () => {
     return gsap.timeline(defaults);
   }, [isClient]);
 
-  const createTween = useCallback((targets: gsap.Target, vars: gsap.TweenVars) => {
+  const createTween = useCallback((targets: gsap.TweenTarget, vars: gsap.TweenVars) => {
     if (!isClient || shouldReduceMotion()) return null;
     return gsap.to(targets, vars);
   }, [isClient]);

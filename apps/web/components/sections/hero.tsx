@@ -127,7 +127,7 @@ export function Hero({ data }: HeroProps) {
             transition={{
               duration: 0.8,
               delay: 0.4,
-              ease: ANIMATION_TOKENS.section.fadeInUp.transition.ease,
+              ease: 'easeOut',
             }}
           >
             <AnimatedText
