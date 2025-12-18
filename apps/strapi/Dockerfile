@@ -57,4 +57,4 @@ ENV STRAPI_DISABLE_UPDATE_NOTIFICATION=true
 
 WORKDIR /app/apps/strapi
 
-CMD ["dumb-init", "node", "../../node_modules/@strapi/strapi/bin/strapi.js", "start"]
+CMD ["dumb-init", "node", "./node_modules/@strapi/strapi/bin/strapi.js", "start"]
