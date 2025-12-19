@@ -1,3 +1,3 @@
 const { createCoreService } = require('@strapi/strapi').factories;
 
-module.exports = createCoreService('api::global-setting.global-setting');
+module.exports = createCoreService('api::global-settings.global-setting');
