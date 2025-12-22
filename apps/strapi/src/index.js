@@ -1,3 +1,5 @@
+const migrateContentTypes = require('../scripts/migrate-content-types');
+
 module.exports = {
   register({ strapi }) {
     // Register custom functionality if needed
@@ -18,6 +20,13 @@ module.exports = {
       strapi.log.info('i18n locales configured');
     }
 
+    // Run content type migration
+    try {
+      await migrateContentTypes.migrateContentTypes(strapi);
+    } catch (error) {
+      strapi.log.error('Failed to run content type migration:', error);
+    }
+
     // Configure public permissions for content types
     const publicRole = await strapi.query('plugin::users-permissions.role').findOne({
       where: { type: 'public' },
@@ -25,7 +34,7 @@ module.exports = {
 
     if (publicRole) {
       const contentTypes = [
-        'api::global-setting.global-setting',
+        'api::global-settings.global-settings',
         'api::page.page',
         'api::service.service',
         'api::service-category.service-category',
